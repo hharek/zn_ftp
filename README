@@ -1,3 +1,8 @@
 Class to work with FTP
 
+Tested on servers: proftpd, pure-ftpd, vsftpd
+
+REQUIREMENTS:
+- PHP 5.2 and up
+- PHP-module FTP (http://ru.php.net/ftp)
 
