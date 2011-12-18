@@ -3,10 +3,10 @@
  * Класс для работы с файлами по протоколу FTP
  * 
  * @category	Networking
- * @author		Petrov Gennadiy <hharek@yandex.ru>
- * @copyright	2011 Petrov Genadiy
+ * @author		Sergeev Denis <hharek@yandex.ru>
+ * @copyright	2011 Sergeev Denis
  * @license		https://github.com/hharek/zn_ftp/wiki/MIT-License MIT License
- * @version		0.2.1
+ * @version		0.2.2
  * @link		https://github.com/hharek/zn_ftp/
  */
 class ZN_FTP
@@ -432,31 +432,31 @@ class ZN_FTP
 				switch ($type)
 				{
 					case "all":
+					{
+						$ls[] = $file_settings;
+					}
+					break;
+
+					case "dir":
+					{
+						if ($file_settings['type'] == "dir")
 						{
 							$ls[] = $file_settings;
 						}
-						break;
+					}
+					break;
 
-					case "dir":
+					case "file":
+					{
+						if ($file_settings['type'] == "file")
 						{
-							if ($file_settings['type'] == "dir")
+							if (mb_substr($file_settings['name'], mb_strlen($file_settings['name'], "UTF-8") - mb_strlen($ext, "UTF-8"), mb_strlen($ext, "UTF-8"), "UTF-8") == $ext)
 							{
 								$ls[] = $file_settings;
 							}
 						}
-						break;
-
-					case "file":
-						{
-							if ($file_settings['type'] == "file")
-							{
-								if (mb_substr($file_settings['name'], mb_strlen($file_settings['name'], "UTF-8") - mb_strlen($ext, "UTF-8"), mb_strlen($ext, "UTF-8"), "UTF-8") == $ext)
-								{
-									$ls[] = $file_settings;
-								}
-							}
-						}
-						break;
+					}
+					break;
 				}
 			}
 		}
@@ -1126,7 +1126,7 @@ class ZN_FTP
 	 * @param string $zip_file
 	 * @return bool
 	 */
-	public function download_and_zip_paths($ftp_paths, $file_name=null, $zip_file=null)
+	public function zip($ftp_paths, $file_name=null, $zip_file=null)
 	{
 		/* Проверка */
 		if (empty($ftp_paths))
@@ -1213,11 +1213,11 @@ class ZN_FTP
 		{
 			if ($val['type'] == "dir")
 			{
-				$this->_download_and_zip_dir($zip, $val['name'], $val['path']);
+				$this->_zip_dir($zip, $val['name'], $val['path']);
 			}
 			elseif ($val['type'] == "file")
 			{
-				$this->_download_and_zip_file($zip, $val['name'], $val['path']);
+				$this->_zip_file($zip, $val['name'], $val['path']);
 			}
 		}
 
@@ -1782,7 +1782,7 @@ class ZN_FTP
 	 * @param type $ftp_dir
 	 * @return bool
 	 */
-	private function _download_and_zip_dir(&$zip, $name, $ftp_dir)
+	private function _zip_dir(&$zip, $name, $ftp_dir)
 	{
 		$zip->addEmptyDir($name);
 
@@ -1799,11 +1799,11 @@ class ZN_FTP
 
 				if ($file_settings['type'] == "dir")
 				{
-					$this->_download_and_zip_dir($zip, $name . "/" . $file_settings['name'], $ftp_dir . "/" . $file_settings['name']);
+					$this->_zip_dir($zip, $name . "/" . $file_settings['name'], $ftp_dir . "/" . $file_settings['name']);
 				}
 				elseif ($file_settings['type'] == "file")
 				{
-					$this->_download_and_zip_file($zip, $name . "/" . $file_settings['name'], $ftp_dir . "/" . $file_settings['name']);
+					$this->_zip_file($zip, $name . "/" . $file_settings['name'], $ftp_dir . "/" . $file_settings['name']);
 				}
 			}
 		}
@@ -1819,7 +1819,7 @@ class ZN_FTP
 	 * @param string $ftp_file
 	 * @return bool
 	 */
-	private function _download_and_zip_file(&$zip, $name, $ftp_file)
+	private function _zip_file(&$zip, $name, $ftp_file)
 	{
 		$tmpfile = tempnam(sys_get_temp_dir(), "znf");
 		$fp = fopen($tmpfile, "wb");
