@@ -6,7 +6,7 @@
  * @author		Sergeev Denis <hharek@yandex.ru>
  * @copyright	2011 Sergeev Denis
  * @license		https://github.com/hharek/zn_ftp/wiki/MIT-License MIT License
- * @version		0.2.2
+ * @version		0.2.3
  * @link		https://github.com/hharek/zn_ftp/
  */
 class ZN_FTP
@@ -398,7 +398,7 @@ class ZN_FTP
 		}
 		
 		$ext = trim($ext);
-		if ($type != "file" and !empty($ext))
+		if ($type != "file" and mb_strlen($ext, "UTF-8") > 0)
 		{
 			throw new Exception("Расширение можно задать только для файлов.", 42);
 		}
@@ -986,13 +986,13 @@ class ZN_FTP
 	 * @param string $file
 	 * @return bool
 	 */
-	public function download($ftp_file, $file=null)
+	public function download($ftp_file, $file="")
 	{
 		/* Проверка */
 		$ftp_file = $this->_normalize_path($ftp_file);
 		$this->_check_chroot($ftp_file);
 
-		if (!empty($file))
+		if (mb_strlen($file, "UTF-8") > 0)
 		{
 			$file = trim($file);
 			if (mb_substr($file, 0, 1, "UTF-8") != "/")
@@ -1023,7 +1023,7 @@ class ZN_FTP
 		fseek($tmp_file, 0);
 
 		/* Выгрузить */
-		if (empty($file))
+		if (mb_strlen($file, "UTF-8") < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"" . basename($ftp_file) . "\"");
@@ -1126,7 +1126,7 @@ class ZN_FTP
 	 * @param string $zip_file
 	 * @return bool
 	 */
-	public function zip($ftp_paths, $file_name=null, $zip_file=null)
+	public function zip($ftp_paths, $file_name="", $zip_file="")
 	{
 		/* Проверка */
 		if (empty($ftp_paths))
@@ -1165,7 +1165,7 @@ class ZN_FTP
 		}
 
 		/* filename */
-		if (empty($file_name))
+		if (mb_strlen($file_name, "UTF-8") < 1)
 		{
 			$file_name = "default.zip";
 		}
@@ -1179,7 +1179,7 @@ class ZN_FTP
 		$file_name = basename($file_name);
 
 		/* zip_file */
-		if (!is_null($zip_file))
+		if (mb_strlen($zip_file, "UTF-8") > 0)
 		{
 			$zip_file = trim($zip_file);
 			if (mb_substr($zip_file, 0, 1, "UTF-8") != "/")
@@ -1234,7 +1234,7 @@ class ZN_FTP
 
 		/* Выдать */
 		$func_args = func_get_args();
-		if (empty ($func_args[2]))
+		if (mb_strlen($func_args[2], "UTF-8") < 1)
 		{
 			header("Content-Type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=\"{$file_name}\"");
@@ -1266,7 +1266,7 @@ class ZN_FTP
 
 		/* Пустая строка */
 		$path = trim($path);
-		if (empty($path))
+		if (mb_strlen($path, "UTF-8") < 1)
 		{
 			throw new Exception("Путь задан неверно. Пустая строка.", 181);
 		}
@@ -1329,7 +1329,7 @@ class ZN_FTP
 
 			/* Строка с начальными или конечными пробелами */
 			$strlen = mb_strlen($val, "UTF-8");
-			$strlen_trim = mb_strlen($val, "UTF-8");
+			$strlen_trim = mb_strlen(trim($val), "UTF-8");
 			if ($strlen != $strlen_trim)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Пробелы в начале или в конце имени файла.", 187);
@@ -1337,7 +1337,7 @@ class ZN_FTP
 
 			/* Не указано имя файла */
 			$val_trim = trim($val);
-			if (empty($val_trim))
+			if (mb_strlen($val_trim, "UTF-8") < 1)
 			{
 				throw new Exception("Путь \"" . func_get_arg(0) . "\" задан неверно. Не задано имя файла.", 188);
 			}
